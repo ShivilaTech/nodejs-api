@@ -6,6 +6,8 @@ const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 const cart = require('../models/cart.model');
 const address = require('../models/address.model');
+var ejs = require('ejs');
+const { messagesById } = require("./chat.controller");
 
 
 
@@ -779,13 +781,35 @@ const address = require('../models/address.model');
       });
     }
   };
+
+
+  exports.dashboad = async ( req, res) => {
+    try {
+    
+      if(!req.params.user_id){
+        return res.status(404).send({
+          message: 'user_id field require.'         
+        });
+      }
+     const cart = await model.dashboadCart(req.params.user_id) 
+     const wishlist = await model.dashboadWishlist(req.params.user_id) 
+     const orders = await model.dashboaOrders(req.params.user_id)     
+      res.send({cart,wishlist,orders});      
+     } catch(err) {
+      console.log(err);     
+      res.status(500).send({
+              message:
+                err.message || "Some error occurred while retrieving Course."
+      });
+    }
+  };
   
 
   
   exports.orderStore = async ( req, res) => {
     try {
       const {user_id,address_id,name,email,payment_option} =req.body
-
+       let to , billTo, userAddress ,  order_detail_data  
       const  carts = await cart.cartByUserID(user_id)
 
       if(carts.length<0){
@@ -803,6 +827,7 @@ const address = require('../models/address.model');
         "postal_code":addressData.postal_code,
         "phone":addressData.phone
       })
+      userAddress=saveaddress;
 
       const combined_order= ({ 
         shipping_address: JSON.stringify(saveaddress),
@@ -825,13 +850,12 @@ const address = require('../models/address.model');
         payment_type:payment_option,
         delivery_viewed:0,
         payment_status_viewed:0,
-        code: moment().format("YYYYMMDD-HH:mm")+ Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000,
+        code: moment().format("YYYYMMDD-")+ Math.floor(Math.random() * (999999 - 100000 + 1)) + 100000,
         date:moment().unix()
       }
             
         const orderres = await model.ordersave(orderdata);
-        console.log(orderres,"orderres")
-    
+          
       
      subtotal = 0;
      tax = 0;
@@ -840,8 +864,8 @@ const address = require('../models/address.model');
      num_of_sale=0;
      grand_total=0
      
-     Promise.all(carts.map(async cartItem => {
-        //  $product = Product::find($cartItem['product_id']);
+     order_detail_data = await  Promise.all(carts.map(async cartItem => {
+        
          let  product = await cart.getProdct(cartItem.product_id)
     
               subtotal += cartItem.price * cartItem.quantity;
@@ -850,8 +874,9 @@ const address = require('../models/address.model');
               product_stock= await cart.getvariantByvariantName(cartItem.product_id,product_variation)
     
               if (product.digital != 1 && cartItem.quantity > product_stock.qty) {
-                 // await model.deleteOrderId(orderres.insertId);
-               
+                  await model.deleteOrderId(orderres.insertId);                   
+                  return false ;
+                  
                   } else if (product.digital != 1) {
                       let product_stock_qty=  product_stock.qty -= cartItem.quantity;
                       let  product_stock_qtyAdd = ({qty:product_stock_qty })
@@ -874,7 +899,8 @@ const address = require('../models/address.model');
               pickup_point_id:pickup_point_id,
               quantity:cartItem.quantity
     
-            })     
+            })          
+          
             
              shipping += cartItem.shipping_cost;
     
@@ -910,13 +936,214 @@ const address = require('../models/address.model');
                const combineOrderdata=({
                 grand_total:grand_total
                })
-             // await model.orderUpdate(orderres.insertId,orderdata)
-              //await model.combineOrderUpdate(CombinedOrderdata.insertId,combineOrderdata)
-      
+              await model.orderUpdate(orderres.insertId,orderdata)
+              await model.combineOrderUpdate(CombinedOrderdata.insertId,combineOrderdata)
+
+             //console.log(product.name,"product")
+
+             const final= {...order_detail, product_name: product.name}
+            return final
         })); 
       
+        
+    total={
+      name,
+      email,
+      subtotal,
+      tax,
+      shipping,      
+      grand_total,
+      order_id: orderdata.code,     
+      order_date:moment().format("DD-MM-YYYY")
+    }  
+    
+     var detisls='';
+
+   order_detail_data.forEach(keys =>{ 
+
+    detisls+= `<tr>
+       <td>${keys.product_name}</td>
+       <td>${keys.shipping_type}</td>
+        <td>${keys.quantity}</td>
+        <td>Rs. ${keys.price}</td>
+        <td>Rs. ${keys.tax}</td>
+        <td class="total">Rs. ${keys.tax+keys.price}</td>
+     </tr>`
+
+     })     
+
+   var message='';
+    message+=  `<!DOCTYPE html>
+      <html lang="en">      
+      <head>
+          <meta charset="UTF-8">
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <title>Product Description</title>
+      
+          <style>              
+              h4,
+              h5,
+              th {
+                  font-weight: lighter;
+                  color: #797f88;
+              }      
+              .header {
+                  background-color: #eceff4;
+                  padding: 2vw;
+              }      
+              .second {
+                  margin-bottom: -39px;
+              }      
+              .second,
+              .third {
+                  display: flex;
+                  /* border: 1px solid black ; */
+                  justify-content: space-between;
+                  margin-top: 0;
+              }      
+              img {
+      
+                  height: 4vw;
+              }      
+              body>div.header>h4 {
+                  margin-top: 1px;
+                  margin-bottom: -14px;
+                  font-size: 26px;
+                  color: black;
+              }      
+              .billingInfo {
+                  margin-bottom: -20px;
+                  padding-left: 2vw;
+              }      
+              table {
+                  margin-top: 5vh;
+                  width: 100%;
+                 
+                  padding: 2vw;
+      
+              }
+      
+              th {
+                  background-color: #eceff4;
+                  text-align: left;
+              }
+      
+              .total {
+                  text-align: right;
+              }
+      
+              .last {
+                  width: 41vw;
+                  float: right;
+                  margin-top: 20px;
+                  padding-right: 2vw;
+              }
+      
+              .lastcontent {
+                  display: flex;
+                  justify-content: space-between;
+              }
+              td{
+                  border-bottom: 1px solid grey;
+              }
+      
+              .lastcontent span{
+                  color: #797f88;
+              }
+      
+          
+      
+      
+              @media only screen and (max-width : 400px) {
+                  body{
+                      font-size: 14px;
+                  }
+                  
+              }
+          </style>
+      </head>
+      
+      <body>
+      
+          <div class="header">
+      
+      
+              <div class="first">
+                  <div class="logo"><img src="/images/logo.png" alt="Logo"></div>
+              </div>
+              <h4>Aipaze</h4>
+              <div class="second">
+                  <div class="email">
+                      <h4>Email : <u>cs-care@aipaze.com</u></h4>
+                  </div>
+                  <div class="orderid">
+                      <h4>Order Id : ${total.order_id}</h4>
+                  </div>
+              </div>
+              <div class="third">
+                  <div class="phone">
+                      <h4>Phone : +91838482883</h4>
+                  </div>
+                  <div class="orderdate">
+                      <h4>Order date : ${total.order_date}</h4>
+                  </div>
+              </div>
+      
+          </div>
+      
+         
+      
+      
+          <h4 class="billingInfo">Bill to:</h4>
+          <h4 class="billingInfo">${userAddress.name}</h4>
+          <h4 class="billingInfo">${userAddress.address} ${userAddress.city} ${userAddress.postal_code} ${userAddress.state} ${userAddress.country}</h4>
+          <h4 class="billingInfo">Email : <u>${userAddress.email}</u></h4>
+          <h4 class="billingInfo">Phone : ${userAddress.phone} </h4>
+      
+      
+      
+          <table>
+              <thead>
+                  <tr>
+                      <th>Product Name</th>
+                      <th>Delivery Type</th>
+                      <th>QTY</th>
+                      <th>Unit Price</th>
+                      <th>Tax</th>
+                      <th class="total">Total</th>
+                  </tr>`;               
+               
+                  message+=detisls+=`</thead>
+          </table>
+      
+      
+      
+          <div class="last">
+              <div class="lastcontent"><span>Sub Total</span><span>Rs.${total.subtotal}</span></div>
+              <div class="lastcontent"><span>Shipping Cost</span><span>Rs.${total.shipping}</span></div>
+              <div class="lastcontent"><span>Total Tax</span><span>Rs.${total.tax}</span></div>        
+              <div class="lastcontent"><span>Grand Total</span><span>Rs.${total.grand_total}</span></div>
+          </div>
+      
+      </body>
+      
+      </html>`;
+  
+    
+     if(order_detail_data[0]==false){   
+      res.status(404).send("The requested quantity is not available")
+     }else {
+
+      mailConfigurations=({
+        to:userAddress.email,
+        subject:"Your Orders",
+        message:message
+      })       
+        await comman.sendmail(mailConfigurations)
        
-      res.send("order saved");      
+      res.send({userAddress,order_detail_data,total});
+     }
+      
      } catch(err) {
       console.log(err);     
       res.status(500).send({
@@ -925,6 +1152,39 @@ const address = require('../models/address.model');
       });
     }
   };
+
+
+  exports.notificationAdd = async ( req, res) => {
+    try {  
+     const result = await model.notificationAdd(req.body)
+      res.send(result);      
+      
+     } catch(err) {
+      console.log(err);     
+      res.status(500).send({
+              message:
+                err.message || "Some error occurred while retrieving Course."
+      });
+
+  }
+  };
+
+  exports.notificationGet = async ( req, res) => {
+    try {  
+     const result = await model.notificationGet(req.params.id)
+      res.send(result);      
+      
+     } catch(err) {
+      console.log(err);     
+      res.status(500).send({
+              message:
+                err.message || "Some error occurred while retrieving Course."
+      });
+
+  }
+  };
+
+  
  
   // exports.updateSetting = async ( req, res) => {
   //   try {

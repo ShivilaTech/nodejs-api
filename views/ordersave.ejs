@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Description</title>
+
+    <style>
+        
+        h4,
+        h5,
+        th {
+            font-weight: lighter;
+            color: #797f88;
+        }
+
+
+        .header {
+            background-color: #eceff4;
+            padding: 2vw;
+        }
+
+        .second {
+            margin-bottom: -39px;
+        }
+
+        .second,
+        .third {
+            display: flex;
+            /* border: 1px solid black ; */
+            justify-content: space-between;
+            margin-top: 0;
+        }
+
+        img {
+
+            height: 4vw;
+        }
+
+
+        body>div.header>h4 {
+            margin-top: 1px;
+            margin-bottom: -14px;
+            font-size: 26px;
+            color: black;
+        }
+
+        .billingInfo {
+            margin-bottom: -20px;
+            padding-left: 2vw;
+        }
+
+        table {
+            margin-top: 5vh;
+            width: 100%;
+           
+            padding: 2vw;
+
+        }
+
+        th {
+            background-color: #eceff4;
+            text-align: left;
+        }
+
+        .total {
+            text-align: right;
+        }
+
+        .last {
+            width: 41vw;
+            float: right;
+            margin-top: 20px;
+            padding-right: 2vw;
+        }
+
+        .lastcontent {
+            display: flex;
+            justify-content: space-between;
+        }
+        td{
+            border-bottom: 1px solid grey;
+        }
+
+        .lastcontent span{
+            color: #797f88;
+        }
+
+    
+
+
+        @media only screen and (max-width : 400px) {
+            body{
+                font-size: 14px;
+            }
+            
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="header">
+
+
+        <div class="first">
+            <div class="logo"><img src="/images/logo.png" alt="Logo"></div>
+        </div>
+        <h4>Aipaze</h4>
+        <div class="second">
+            <div class="email">
+                <h4>Email : <u>cs-care@aipaze.com</u></h4>
+            </div>
+            <div class="orderid">
+                <h4>Order Id : 2342342-23423423</h4>
+            </div>
+        </div>
+        <div class="third">
+            <div class="phone">
+                <h4>Phone : +91838482883</h4>
+            </div>
+            <div class="orderdate">
+                <h4>Order date : 08-08-2023</h4>
+            </div>
+        </div>
+
+    </div>
+
+    <%=  userAddress %>
+
+    <% JSON.stringify(order_detail_data) %>
+
+
+    <h4 class="billingInfo">Bill to:</h4>
+    <h4 class="billingInfo">biswa</h4>
+    <h4 class="billingInfo">40/1 tangra road, Kolkata, India</h4>
+    <h4 class="billingInfo">Email : <u>biswabrata77@gmail.com</u></h4>
+    <h4 class="billingInfo">Phone : 7272838749 </h4>
+
+
+
+    <table>
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Delivery Type</th>
+                <th>QTY</th>
+                <th>Unit Price</th>
+                <th>Tax</th>
+                <th class="total">Total</th>
+            </tr>
+
+            <tr>
+                <td>ff</td>
+                <td>Home Delivery</td>
+                <td>1</td>
+                <td>Rs. 1.00</td>
+                <td>Rs. 0.00</td>
+                <td class="total">Rs. 1.00</td>
+            </tr>
+            
+            <tr>
+                <td>ff</td>
+                <td>Home Delivery</td>
+                <td>1</td>
+                <td>Rs. 1.00</td>
+                <td>Rs. 0.00</td>
+                <td class="total">Rs. 1.00</td>
+            </tr>
+        </thead>
+    </table>
+
+
+
+    <div class="last">
+        <div class="lastcontent"><span>Sub Total</span><span>Rs. 1.00</span></div>
+        <div class="lastcontent"><span>Shipping Cost</span><span>Rs. 0.00</span></div>
+        <div class="lastcontent"><span>Total Tax</span><span>Rs. 0.00</span></div>
+        <div class="lastcontent"><span>Coupon</span><span>Rs. 0.00</span></div>
+        <div class="lastcontent"><span>Grand Total</span><span>Rs. 1.00</span></div>
+    </div>
+
+</body>
+
+</html>

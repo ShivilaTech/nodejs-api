@@ -684,6 +684,64 @@ exports.orderUpdate = async (id,inputData) =>{
    }    
 };
 
+
+
+exports.dashboadCart = async (id) =>{
+  try {  
+    return new Promise((resolve, reject)=>{     
+      const sql = `SELECT COUNT(id) as cartCount from carts WHERE user_id=${id}`;
+      db.query(sql,  (error, elements)=>{
+            if(error){
+                return reject(error);
+            }
+            return resolve(elements);
+        });
+    });
+    
+   } catch(err) {
+    console.log(err);     
+   }    
+};
+
+exports.dashboadWishlist = async (id) =>{
+  try {  
+    return new Promise((resolve, reject)=>{     
+      const sql = `SELECT COUNT(id) as wishlisttCount from wishlists WHERE user_id=${id}`;
+      db.query(sql,  (error, elements)=>{
+            if(error){
+                return reject(error);
+            }
+            return resolve(elements);
+        });
+    });
+    
+   } catch(err) {
+    console.log(err);     
+   }    
+};
+
+exports.dashboaOrders = async (id) =>{
+  try {  
+    return new Promise((resolve, reject)=>{     
+      const sql = `SELECT COUNT(id) as ordersCount from orders WHERE user_id=${id}`;
+      db.query(sql,  (error, elements)=>{
+            if(error){
+                return reject(error);
+            }
+            return resolve(elements);
+        });
+    });
+    
+   } catch(err) {
+    console.log(err);     
+   }    
+};
+
+
+
+
+
+
 exports.combineOrderUpdate = async (id,inputData) =>{
   try {  
     return new Promise((resolve, reject)=>{     
@@ -701,3 +759,43 @@ exports.combineOrderUpdate = async (id,inputData) =>{
    }    
 };
 
+
+
+
+exports.notificationAdd = async (inputData) =>{
+
+  try {  
+    return new Promise((resolve, reject)=>{ 
+    
+      var sql = 'INSERT INTO notifications SET ?';
+      db.query(sql,inputData,  (error, elements)=>{
+            if(error){
+                return reject(error);
+            }
+            return resolve(elements);
+        });
+    });
+    
+   } catch(err) {
+    console.log(err);     
+   }    
+};
+
+exports.notificationGet = async (id) =>{
+
+  try {  
+    return new Promise((resolve, reject)=>{ 
+    
+      var sql = `select * from notifications where notifiable_id=${id} `;
+      db.query(sql,  (error, elements)=>{
+            if(error){
+                return reject(error);
+            }
+            return resolve(elements);
+        });
+    });
+    
+   } catch(err) {
+    console.log(err);     
+   }    
+};

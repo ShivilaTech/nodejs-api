@@ -24,6 +24,10 @@ router.get("/purchase-history-details/:order_id", controller.orderDetailsById);
 router.post('/upload-multiple/:user_id', upload.uploadSingleV2);
 router.post('/upload-ImageAndUpdate/:user_id', upload.uploadAndUpdateUser);
 router.post('/order-store', controller.orderStore);
+router.get('/dashboard/:user_id', controller.dashboad);
+router.post('/notification-add', controller.notificationAdd);
+router.get('/notification-get/:id', controller.notificationGet);
+
 
 
 
