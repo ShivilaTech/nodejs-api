@@ -1184,24 +1184,40 @@ const { messagesById } = require("./chat.controller");
   }
   };
 
-  
- 
-  // exports.updateSetting = async ( req, res) => {
-  //   try {
-  //    const {,user_id} = req.body;     
-  //    const inputData =({
-  //     device_token: Cash Payment,
-  //     Bank Payment 
-  //    });
-  //     const user = await model.update_setting(inputData,user_id)
-  //        res.send(user);   
-  //    } catch(err) {
-  //     console.log(err);     
-  //     res.status(500).send({
-  //             message:
-  //               err.message || "Some error occurred while retrieving Course."
-  //     });
 
-  // }
-  // };m  
+  exports.updatePaymentStatus = async ( req, res) => {
+    try {
+ 
+      const user = await model.updatePaymentStatus(req.params.order_id,req.body)
+      res.send(user);   
+     } catch(err) {
+      console.log(err);     
+      res.status(500).send({
+              message:
+                err.message || "Some error occurred while retrieving Course."
+      });
+
+  }
+  };
+
+  exports.ImageListByUserId = async ( req, res) => {
+    try {
+    
+      if(!req.params.user_id){
+        return res.status(404).send({
+          message: 'user_id field require.'         
+        });
+      }
+     const userData = await model.ImageListByUserId(req.params.user_id)     
+      res.send(userData);      
+     } catch(err) {
+      console.log(err);     
+      res.status(500).send({
+              message:
+                err.message || "Some error occurred while retrieving Course."
+      });
+    }
+  };
+  
+
 

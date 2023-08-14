@@ -5,7 +5,7 @@ const moment = require('moment');
     
     exports.delete = async ( req, res) => {
         try {
-        const data = await model.delete(req.params.id);
+        const data = await cart.delete(req.params.id);
         res.send(data);
         
         } catch(err) {
@@ -90,8 +90,8 @@ const moment = require('moment');
        }   
        
        const addtocart=({
-        owner_id:user_id,
-        user_id:product.user_id,
+        owner_id:product.user_id,
+        user_id:user_id,
         variation:variantrequest,        
         product_id:req.body.id,
         price:price,
@@ -127,6 +127,17 @@ const moment = require('moment');
                 })
             }
       
+        } catch (error) {        
+            console.log(error);       
+        }
+ }
+
+ exports.cartUpdateTempId = async (req, res) => {
+    try {      
+                
+            const resdata=  await cart.cartUpdateTempId(req.body.temp_id,req.body.user_id)            
+            res.send({resdata, message:'temp id updated'})        
+           
         } catch (error) {        
             console.log(error);       
         }

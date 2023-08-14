@@ -27,6 +27,9 @@ router.post('/order-store', controller.orderStore);
 router.get('/dashboard/:user_id', controller.dashboad);
 router.post('/notification-add', controller.notificationAdd);
 router.get('/notification-get/:id', controller.notificationGet);
+router.post("/update-payment-status/:order_id", controller.updatePaymentStatus);
+router.get('/image-lis/:user_id', controller.ImageListByUserId);
+
 
 
 

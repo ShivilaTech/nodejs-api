@@ -43,12 +43,33 @@ exports.changeQuantity = async (id,quantity) =>{
      }
 };
 
+exports.cartUpdateTempId = async (id,user_id) =>{
+  try {   
+    const inputData=({'user_id':user_id})
+    return new Promise((resolve, reject)=>{  
+      
+      const sql = `UPDATE carts SET ? WHERE temp_user_id = '${id}'`;   
+      db.query(sql,[inputData],  (error, elements)=>{
+            if(error){
+                return reject(error);
+            }
+            return resolve(elements);
+        });
+    });
+    
+   } catch(err) {
+    console.log(err);     
+   }
+};
+
+
+
 exports.getcartByUserID = async (id) =>{
     try {  
   
       return new Promise((resolve, reject)=>{   
   
-        db.query(`SELECT * FROM carts  join products on carts.owner_id=products.id where carts.user_id = ${id} `,  (error, elements)=>{
+        db.query(`SELECT * FROM carts  join products on carts.owner_id=products.id where carts.user_id = '${id}' or  carts.temp_user_id = '${id}' `,  (error, elements)=>{
               if(error){
                   return reject(error);
               }

@@ -6,6 +6,8 @@ module.exports={
   getByBrand: function (id,serch,result) {
 
     let sql='';
+    let where='';
+    let sort='';
     if(serch.price_max>0 && serch.price_min>0){
       sql=`and unit_price BETWEEN ${serch.price_min} AND ${serch.price_max}`;
     }
@@ -20,11 +22,28 @@ module.exports={
        sql=`and choice_options LIKE '%${serch.generator}%' `;
     }
 
+    if(id!="all"){
+      where=` and brands.slug like '%${id}%'`
+    }   
+    
+    if(serch.Sortby=="newest"){
+      sort= `order by  products.id desc `
+    }
+    if(serch.Sortby=="oldest"){
+      sort= `order by  products.id asc`
+    }
+    if(serch.Sortby=="price_low"){
+      sort= `order by  products.unit_price asc`
+    }
+    if(serch.Sortby=="price_high"){
+      sort= `order by products.unit_price desc`
+    }
+
     let query = `SELECT json_extract(products.choice_options, '$[0].values[*]') AS choice_options, brands.name as brand_name,products.unit_price,products.name,products.id,products.discount,products.discount_type,products.discount_end_date , uploads.file_original_name ,uploads.file_name, uploads.extension, ROUND(AVG(reviews.rating)) as rating FROM  products
      left join uploads on products.thumbnail_img=uploads.id
      left join reviews on products.id =reviews.product_id
      left join brands on products.brand_id =brands.id
-       where brands.slug like '%${id}%' ${sql}  GROUP by products.id`;  
+     where 1 ${where} ${sql} GROUP by products.id  ${sort}`;  
      
     db.query(query, (err, res) => {
       if (err) {
@@ -38,8 +57,9 @@ module.exports={
   },
 //Aashirvaad-Select-Sharbati-Whole-Wheat-Atta-5-kg-Tgvq5
   getbyCategory: function (id,serch,result) {
-
-     let sql='';
+    let sql='';
+    let where='';
+    
     if(serch.price_max>0 && serch.price_min>0){
       sql=`and unit_price BETWEEN ${serch.price_min} AND ${serch.price_max}`;
     }
@@ -53,14 +73,17 @@ module.exports={
     if(serch.litter>0){
        sql=`and choice_options LIKE '%${serch.generator}%' `;
     }
-    
+
+    if(id!="all"){
+      where=` and categories.slug like '%${id}%'`
+    }     
     
     let query = `SELECT json_extract(products.choice_options, '$[0].values[*]') AS choice_options, brands.name as brand_name,products.unit_price, products.name,products.id,products.discount,products.discount_type,products.discount_end_date , uploads.file_original_name ,uploads.file_name, uploads.extension, ROUND(AVG(reviews.rating)) as rating FROM  products
     left join uploads on products.thumbnail_img=uploads.id
     left join reviews on products.id =reviews.product_id
     left join brands on products.brand_id =brands.id
     left join categories on products.category_id =categories.id
-      where categories.slug like '%${id}%' ${sql} GROUP by products.id`; 
+    where 1 ${where} ${sql} GROUP by products.id`; 
      
     db.query(query, (err, res) => {
       if (err) {

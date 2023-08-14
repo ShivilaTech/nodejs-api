@@ -157,6 +157,26 @@ exports.getwishlistbyId = async (user_id,product_id	) =>{
    }    
 };
 
+exports.ImageListByUserId = async (user_id) =>{
+
+  try {  
+    return new Promise((resolve, reject)=>{  
+      
+      sql= 'SELECT * FROM uploads WHERE user_id = ?', 
+
+      db.query(sql,[user_id],  (error, elements)=>{
+            if(error){
+                return reject(error);
+            }
+            return resolve(elements);
+        });
+    });
+    
+   } catch(err) {
+    console.log(err);     
+   }    
+};
+
 exports.deletewishlistUserId = async (user_id,product_id	) =>{
 
   try {  
@@ -792,6 +812,34 @@ exports.notificationGet = async (id) =>{
                 return reject(error);
             }
             return resolve(elements);
+        });
+    });
+    
+   } catch(err) {
+    console.log(err);     
+   }    
+};
+
+
+
+
+exports.updatePaymentStatus = async (id,inputData) =>{
+
+  try {  
+    return new Promise((resolve, reject)=>{       
+     
+      const sql = 'UPDATE orders SET ? WHERE id = ?'; 
+
+      db.query(sql,[inputData, id],  (error, elements)=>{
+            if(error){
+                return reject(error);
+            }
+           
+            if(elements.affectedRows>0){
+              return resolve({message:"successfully updated"});
+            }
+
+            
         });
     });
     
