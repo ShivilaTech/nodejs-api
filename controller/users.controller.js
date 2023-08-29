@@ -562,7 +562,7 @@ const { messagesById } = require("./chat.controller");
             }, 'secret', { expiresIn: '1h' });
 
                res.send({
-                
+                id:user.id,
                 name:user.name,
                 email:user.email,
                 user_type:user.user_type,
