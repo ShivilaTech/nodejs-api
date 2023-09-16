@@ -28,7 +28,15 @@ const moment = require('moment');
         const quantity= req.body.quantity;
         const variantrequest= req.body.variant;
         const user_id= req.body.user_id;
-        
+        const userID = req.body.temp_user_id ? req.body.temp_user_id : user_id;                 
+         const checkProduct=  await cart.getcartByUserID(userID) 
+         if(checkProduct!=''){
+            
+            if(checkProduct[0].product_id==req.body.id){
+                return res.send({msg:'Product already in cart'});
+             }
+        } 
+                
          
          if(!req.body.variant){
             price = product.unit_price;
@@ -117,8 +125,10 @@ const moment = require('moment');
 
  exports.cartChangeQuantity = async (req, res) => {
     try {           
-          const cartData =  await cart.getcartById(req.body.id)          
-          if(cartData.variation>= req.body.quantity){
+          const cartData =  await cart.getcartById(req.body.id) 
+          const  variant =  await cart.getvariantByvariantName(cartData.product_id ,cartData.variation) 
+                  
+          if(req.body.quantity<=variant.qty){
             const resdata=  await cart.changeQuantity(req.body.id,req.body.quantity)            
             res.send({resdata, message:'Cart updated'})          
             }else {
@@ -170,7 +180,7 @@ exports.summary = async (req,res) => {
 
             let item_sum = 0.00;
             item_sum += (cartItem.price + cartItem.tax) * cartItem.quantity;
-            item_sum += cartItem.shipping_cost - cartItem.discount;
+            item_sum += (cartItem.shipping_cost - cartItem.discount)
             sum +=  item_sum  ;   //// 'grand_total' => $request->g
 
             subtotal += cartItem.price * cartItem.quantity;

@@ -69,7 +69,7 @@ exports.getcartByUserID = async (id) =>{
   
       return new Promise((resolve, reject)=>{   
   
-        db.query(`SELECT * FROM carts  join products on carts.owner_id=products.id where carts.user_id = '${id}' or  carts.temp_user_id = '${id}' `,  (error, elements)=>{
+        db.query(`SELECT carts.*  , carts.id as cart_id  , products.*  FROM carts  join products on carts.owner_id=products.id where carts.user_id = '${id}' or  carts.temp_user_id = '${id}'  order by carts.id desc `,  (error, elements)=>{
               if(error){
                   return reject(error);
               }
