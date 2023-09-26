@@ -171,22 +171,25 @@ exports.summary = async (req,res) => {
         let sum = 0.00;
         let subtotal = 0.00;
         let tax = 0.00;
-        let shipping_cost =0.00;
-        let discount =0.00;
+        let shipping_cost = 0.00;
+        let discount = 0.00;
 
-        const cartData =  await cart.cartByUserID(req.params.user_id)
+        const cartData =  await cart.getcartByUserID(req.params.user_id)  
         
         cartData.forEach(cartItem => {
 
             let item_sum = 0.00;
             item_sum += (cartItem.price + cartItem.tax) * cartItem.quantity;
-            item_sum += (cartItem.shipping_cost - cartItem.discount)
-            sum +=  item_sum  ;   //// 'grand_total' => $request->g
+           // item_sum += (cartItem.shipping_cost - cartItem.discount)
+            //// 'grand_total' => $request->g
 
             subtotal += cartItem.price * cartItem.quantity;
             tax += cartItem.tax * cartItem.quantity;
-            discount += cartItem.discount;
+            discount += cartItem.discount * cartItem.quantity;
             shipping_cost += cartItem.shipping_cost
+
+            sum = parseInt(subtotal) + parseInt(tax) + parseInt(shipping_cost); 
+        
 
         })
        
@@ -195,7 +198,7 @@ exports.summary = async (req,res) => {
             'sub_total':subtotal,
             'tax': tax,
             'shipping_cost':shipping_cost,
-            'discount' :discount,
+            'discount' : discount,
             'grand_total':sum, 
             
          });
