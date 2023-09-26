@@ -22,6 +22,7 @@ const moment = require('moment');
     try {
         let price;
         let tax = 0;
+        let discount=0;
         const  variant =  await cart.getvariantByvariantName(req.body.id,req.body.variant)         
         const product =  await cart.getProdct(req.body.id)
         const ProdctTax =  await cart.getProdctTax(req.body.id)
@@ -60,9 +61,11 @@ const moment = require('moment');
          if (discount_applicable) {
             if(product.discount_type == 'percent'){
                 price -= (price*product.discount)/100;
+                discount = (price*product.discount)/100;
             }
             else if(product.discount_type == 'amount'){
                 price -= product.discount;
+                discount =product.discount;
             }
          }     
 
@@ -106,7 +109,8 @@ const moment = require('moment');
         tax:tax,
         quantity:quantity, 
         shipping_cost:0,
-        temp_user_id:req.body.temp_user_id
+        temp_user_id:req.body.temp_user_id,
+        discount:discount
        })
            await cart.addCart(addtocart);
       
@@ -184,18 +188,27 @@ exports.summary = async (req,res) => {
             //// 'grand_total' => $request->g
 
             subtotal += cartItem.price * cartItem.quantity;
-            tax += cartItem.tax * cartItem.quantity;
-            discount += cartItem.discount * cartItem.quantity;
-            shipping_cost += cartItem.shipping_cost
+            tax += cartItem.cart_tax * cartItem.quantity;
 
-            sum = parseInt(subtotal) + parseInt(tax) + parseInt(shipping_cost); 
+            // if(product_tax.tax_type =='percent'){
+            //     tax += (price * product_tax.tax) / 100;
+            //   }else if(product_tax.tax_type =='amount'){
+            //     tax += product_tax.tax;
+            //   } 
+
+                 
+
+            discount += cartItem.cart_discount * cartItem.quantity;    
+            shipping_cost += parseInt(cartItem.shipping_cost)
+
+            sum = (subtotal) + (tax) + (shipping_cost); 
         
 
         })
        
 
       const  response= ({
-            'sub_total':subtotal,
+            'sub_total':(subtotal),
             'tax': tax,
             'shipping_cost':shipping_cost,
             'discount' : discount,
